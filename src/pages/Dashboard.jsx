@@ -1,28 +1,101 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { messaging } from "../firebase";
+import StudentCard from "../components/StudentCard";
+import TeacherCard from "../components/TeacherCard";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("home");
+  const [loggedOut, setLoggedOut] = useState(false);
+
+  // Request notification permission and handle foreground messages
+  useEffect(() => {
+    if (window.Notification && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+    // Listen for foreground messages
+    if (messaging) {
+      import("firebase/messaging").then(({ onMessage }) => {
+        onMessage(messaging, (payload) => {
+          toast.info(
+            `Notification: ${payload.notification?.title || ""} - ${payload.notification?.body || ""}`
+          );
+        });
+      });
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    toast.info("Logged out successfully!");
-    navigate("/signin");
+    setLoggedOut(true);
+    setTimeout(() => {
+      setLoggedOut(false);
+      navigate("/"); // Redirect to login page
+    }, 2000);
+  };
+
+  const handleSendNotification = async () => {
+    // This is a demo: show a toast and, if possible, a browser notification
+    toast.success("Demo notification sent!");
+    if (window.Notification && Notification.permission === "granted") {
+      new Notification("Demo Notification", {
+        body: "This is a test push notification!",
+        icon: "/icon-192.png",
+      });
+    }
   };
 
   const renderSection = () => {
     switch (activeSection) {
-      case "students":
-        return <p className="text-xl">👨‍🎓 Students Data (Static Placeholder)</p>;
-      case "teachers":
-        return <p className="text-xl">👩‍🏫 Teachers Data (Static Placeholder)</p>;
-      case "classes":
+      case "students": {
+        // Example data, replace with real API data in full-stack version
+        const students = [
+          { name: "Aman Sharma", email: "aman@example.com", status: "Active", avatar: "" },
+          { name: "Priya Singh", email: "priya@example.com", status: "Inactive", avatar: "" },
+          { name: "Rahul Verma", email: "rahul@example.com", status: "Active", avatar: "" },
+        ];
         return (
-          <p className="text-xl">🏫 Classes Overview (Static Placeholder)</p>
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Students</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {students.map((student, idx) => (
+                <StudentCard key={idx} student={student} />
+              ))}
+            </div>
+          </div>
         );
-      default:
+      }
+      case "teachers": {
+        // Example data, replace with real API data in full-stack version
+        const teachers = [
+          { name: "Sunita Mehra", email: "sunita@example.com", subject: "Mathematics", avatar: "" },
+          { name: "Vikram Patel", email: "vikram@example.com", subject: "Science", avatar: "" },
+          { name: "Anjali Rao", email: "anjali@example.com", subject: "English", avatar: "" },
+        ];
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Teachers</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {teachers.map((teacher, idx) => (
+                <TeacherCard key={idx} teacher={teacher} />
+              ))}
+            </div>
+          </div>
+        );
+      }
+      case "classes": {
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Classes</h2>
+            <div className="bg-white rounded-lg shadow-md p-6 text-center text-xl text-gray-700">
+              🏫 Classes Overview (Static Placeholder)
+            </div>
+          </div>
+        );
+      }
+      default: {
         return (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white shadow rounded p-5 text-center">
@@ -51,8 +124,20 @@ export default function Dashboard() {
             </div>
           </div>
         );
+      }
     }
   };
+
+  if (loggedOut) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="bg-white p-10 rounded-xl shadow-md text-center">
+          <h1 className="text-3xl font-bold text-green-600 mb-2">You are logged out</h1>
+          <p className="text-gray-600">Redirecting to login...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -97,6 +182,12 @@ export default function Dashboard() {
             className="text-left mt-6 bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
           >
             Logout
+          </button>
+          <button
+            onClick={handleSendNotification}
+            className="mt-4 bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 transition"
+          >
+            Send Notification
           </button>
         </nav>
       </div>

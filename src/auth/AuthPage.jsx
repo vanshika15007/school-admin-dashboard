@@ -1,19 +1,36 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login, signup } from "../firebase/auth";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Dummy login/signup logic
-    if (email && password) {
-      navigate("/dashboard");
-    } else {
-      alert("Please fill all fields");
+    setError("");
+    setLoading(true);
+    try {
+      if (isLogin) {
+        await login(email, password);
+        navigate("/dashboard");
+      } else {
+        await signup(email, password);
+        setIsLogin(true);
+        setError("Signup successful! Please login.");
+      }
+    } catch (err) {
+      if (isLogin) {
+        setError("Invalid email or password. Please try again or sign up.");
+      } else {
+        setError("Signup failed. Email may already be in use.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -25,6 +42,7 @@ export default function AuthPage() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
           <input
             type="email"
             placeholder="Email"
@@ -45,9 +63,10 @@ export default function AuthPage() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-60"
+            disabled={loading}
           >
-            {isLogin ? "Login" : "Sign Up"}
+            {loading ? (isLogin ? "Logging in..." : "Signing up...") : (isLogin ? "Login" : "Sign Up")}
           </button>
         </form>
 
