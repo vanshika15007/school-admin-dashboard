@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getMessaging } from "firebase/messaging";
 
@@ -12,10 +12,12 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Check if Firebase has already been initialized
+// Initialize Firebase only if it hasn't been initialized yet
 let app;
-if (!app) {
+if (!getApps().length) {
   app = initializeApp(firebaseConfig);
+} else {
+  app = getApps()[0]; // Use the existing app
 }
 
 export const auth = getAuth(app);
