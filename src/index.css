@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Define custom CSS variables for a modern colorful palette */
+:root {
+  --color-primary: #4285F4; /* Vibrant Google Blue */
+  --color-secondary: #673AB7; /* Deep Purple */
+  --color-accent-green: #0F9D58; /* Google Green */
+  --color-accent-orange: #F4B400; /* Google Yellow/Orange */
+  --color-accent-red: #DB4437; /* Google Red */
+
+  --color-background: #F0F2F5; /* Light subtle gray background */
+  --color-surface: #FFFFFF; /* White for cards and elevated surfaces */
+  --color-text-dark: #212121; /* Dark charcoal for headings and main content */
+  --color-text-light: #757575; /* Medium gray for descriptions and secondary info */
+  --color-border: #E0E0E0; /* Light gray border */
+}
+
+/* Apply the font globally */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text-dark);
+}
