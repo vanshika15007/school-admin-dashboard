@@ -12,7 +12,12 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+// Check if Firebase has already been initialized
+let app;
+if (!app) {
+  app = initializeApp(firebaseConfig);
+}
+
 export const auth = getAuth(app);
 export const messaging = getMessaging(app);
 export default app;
