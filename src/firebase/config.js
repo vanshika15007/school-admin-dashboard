@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCAdYChl-HxaF0nTJ501oATm2Rg2rC_uAI",
+  apiKey: "your API key",
   authDomain: "school-admin-dashboard-98244.firebaseapp.com",
   projectId: "school-admin-dashboard-98244",
   storageBucket: "school-admin-dashboard-98244.firebasestorage.app",
